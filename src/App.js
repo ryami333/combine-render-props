@@ -12,17 +12,19 @@ const consumers = [
 
 const Combined = consumers.reduce(
     (Carry, Consumer) => {
-        return ({ children }) => (
-            <Carry>
-                {(...carryArgs) => {
-                    return (
-                        <Consumer>
-                            {(...args) => children(...carryArgs, ...args)}
-                        </Consumer>
-                    );
-                }}
-            </Carry>
-        );
+        return class X extends React.Component {
+            renderChildren = (...args) =>
+                this.props.children(...this.carryArgs, ...args);
+
+            renderCarry = (...carryArgs) => {
+                this.carryArgs = carryArgs;
+                return <Consumer>{this.renderChildren}</Consumer>;
+            };
+
+            render() {
+                return <Carry>{this.renderCarry}</Carry>;
+            }
+        };
     },
     ({ children }) => children(),
 );
