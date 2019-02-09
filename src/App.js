@@ -7,8 +7,10 @@ const BazContext = React.createContext('baz');
 function createAugmentedConsumer(Consumer) {
   return class X extends React.Component {
     renderChildren = (...consumerArgs) => {
-      const { args = [] } = this.props;
-      return this.props.children(...consumerArgs, ...args);
+      const { args } = this.props;
+      return args
+        ? this.props.children(...consumerArgs, ...args)
+        : this.props.children(...consumerArgs);
     };
 
     render() {
@@ -25,13 +27,15 @@ const augmentedConsumers = [
 
 const Combined = augmentedConsumers.reduce(
   (Carry, Consumer) => {
-    return ({ children, args }) => {
+    return ({ children, args = [] }) => {
       return (
-        <Consumer args={args}>
+        <Consumer args={[...args]}>
           {(...consumerArgs) => {
             return (
-              <Carry args={consumerArgs}>
-                {carryArgs => children(carryArgs)}
+              <Carry args={[...consumerArgs]}>
+                {(...carryArgs) => {
+                  return children(...carryArgs);
+                }}
               </Carry>
             );
           }}
@@ -43,7 +47,7 @@ const Combined = augmentedConsumers.reduce(
 );
 
 function App() {
-  return <Combined>{(...args) => args}</Combined>;
+  return <Combined>{([foo, bar, baz]) => foo + bar + baz}</Combined>;
 }
 
 export default App;
