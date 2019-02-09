@@ -4,22 +4,25 @@ const FooContext = React.createContext('foo');
 const BarContext = React.createContext('bar');
 const BazContext = React.createContext('baz');
 
-const Combined = () => (
-    <FooContext.Consumer>
-        {foo => (
-            <BarContext.Consumer>
-                {bar => (
-                    <BazContext.Consumer>
-                        {baz => `${foo}${bar}${baz}`}
-                    </BazContext.Consumer>
-                )}
-            </BarContext.Consumer>
-        )}
-    </FooContext.Consumer>
+const Combined = [FooContext, BarContext, BazContext].reduce(
+    (Carry, Context) => {
+        return ({ children }) => (
+            <Carry>
+                {(...carryArgs) => {
+                    return (
+                        <Context.Consumer>
+                            {(...args) => children(...carryArgs, ...args)}
+                        </Context.Consumer>
+                    );
+                }}
+            </Carry>
+        );
+    },
+    ({ children }) => children(),
 );
 
 function App() {
-    return <Combined />;
+    return <Combined>{(foo, bar, baz) => foo + bar + baz}</Combined>;
 }
 
 export default App;
