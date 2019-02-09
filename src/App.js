@@ -32,19 +32,17 @@ const Combined = augmentedConsumers.reduce(
         args: [],
       };
 
+      renderCarry = (...carryArgs) => {
+        return this.props.children(...carryArgs);
+      };
+
+      renderConsumer = (...consumerArgs) => {
+        return <Carry args={[...consumerArgs]}>{this.renderCarry}</Carry>;
+      };
+
       render() {
         return (
-          <Consumer args={[...this.props.args]}>
-            {(...consumerArgs) => {
-              return (
-                <Carry args={[...consumerArgs]}>
-                  {(...carryArgs) => {
-                    return this.props.children(...carryArgs);
-                  }}
-                </Carry>
-              );
-            }}
-          </Consumer>
+          <Consumer args={[...this.props.args]}>{this.renderConsumer}</Consumer>
         );
       }
     };
