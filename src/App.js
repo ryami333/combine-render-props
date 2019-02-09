@@ -27,20 +27,26 @@ const augmentedConsumers = [
 
 const Combined = augmentedConsumers.reduce(
   (Carry, Consumer) => {
-    return ({ children, args = [] }) => {
-      return (
-        <Consumer args={[...args]}>
-          {(...consumerArgs) => {
-            return (
-              <Carry args={[...consumerArgs]}>
-                {(...carryArgs) => {
-                  return children(...carryArgs);
-                }}
-              </Carry>
-            );
-          }}
-        </Consumer>
-      );
+    return class X extends React.Component {
+      static defaultProps = {
+        args: [],
+      };
+
+      render() {
+        return (
+          <Consumer args={[...this.props.args]}>
+            {(...consumerArgs) => {
+              return (
+                <Carry args={[...consumerArgs]}>
+                  {(...carryArgs) => {
+                    return this.props.children(...carryArgs);
+                  }}
+                </Carry>
+              );
+            }}
+          </Consumer>
+        );
+      }
     };
   },
   ({ children, args }) => children(args),
