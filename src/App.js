@@ -18,6 +18,12 @@ function createAugmentedConsumer(Consumer) {
 
 const AugmentedFoo = createAugmentedConsumer(FooContext.Consumer);
 
+const augmentedConsumers = [
+    FooContext.Consumer,
+    BarContext.Consumer,
+    BazContext.Consumer,
+].map(Consumer => createAugmentedConsumer(Consumer));
+
 function App() {
     return (
         <AugmentedFoo args={['bar']}>{(foo, bar) => foo + bar}</AugmentedFoo>
