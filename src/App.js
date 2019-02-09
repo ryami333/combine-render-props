@@ -4,15 +4,21 @@ const FooContext = React.createContext('foo');
 const BarContext = React.createContext('bar');
 const BazContext = React.createContext('baz');
 
-const Combined = [FooContext, BarContext, BazContext].reduce(
-    (Carry, Context) => {
+const consumers = [
+    FooContext.Consumer,
+    BarContext.Consumer,
+    BazContext.Consumer,
+];
+
+const Combined = consumers.reduce(
+    (Carry, Consumer) => {
         return ({ children }) => (
             <Carry>
                 {(...carryArgs) => {
                     return (
-                        <Context.Consumer>
+                        <Consumer>
                             {(...args) => children(...carryArgs, ...args)}
-                        </Context.Consumer>
+                        </Consumer>
                     );
                 }}
             </Carry>
